@@ -1,5 +1,3 @@
-import { faBook } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Component } from "react";
 import { Button } from "react-bootstrap";
 
@@ -36,8 +34,8 @@ class ToDoInput extends Component{
                 <div className="container" style={{border:"1px solid lightcyan",alignItems:"center",width:"70%",margin:"auto",padding:"20px"}}>
                     <div className="row" style={{marginBottom:"10px"}}>
                         <div className="col-xs-12 col-12">
-                            <span  style={{backgroundColor:"cyan",padding:"5px"}}><FontAwesomeIcon icon={faBook} size="lg"/></span>
-                            <input name="todo" value={this.state.todo} onChange={this.handleInput} placeholder="New todo" className="col-xs-11 col-11"></input></div>
+                            <span  style={{backgroundColor:"cyan",padding:"5px"}} className="fa fa-book"></span>
+                            <input type="text" name="todo" value={this.state.todo} onChange={this.handleInput} placeholder="New todo" className="col-xs-11 col-11"></input></div>
                         </div>
                         <Button type="submit" className="col-xs-12 col-12" onClick={this.handleAddTask}>New Task</Button>
                 </div>

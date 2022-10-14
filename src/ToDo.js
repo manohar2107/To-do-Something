@@ -13,6 +13,7 @@ class ToDO extends Component{
     }
     this.handleAddingTask=this.handleAddingTask.bind(this);
     this.handleCheck=this.handleCheck.bind(this);
+    this.handleChangedTask=this.handleChangedTask.bind(this);
   }
 
   handleAddingTask(val){
@@ -40,12 +41,20 @@ class ToDO extends Component{
     })
   }
 
+  handleChangedTask(val){
+    this.setState({
+      tasks:val
+    });
+  }
+
   render(){
     return (
       <>
       <div className='App'>
         <ToDoInput onAddingTask={this.handleAddingTask} />
-        <ToDoList  tasks={this.state.tasks} onChangingCheck={this.handleCheck}/>
+        <ToDoList  tasks={this.state.tasks}
+         onChangingCheck={this.handleCheck}
+         onChangingTask={this.handleChangedTask}/>
       </div>
       </>
     );

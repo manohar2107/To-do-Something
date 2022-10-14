@@ -1,59 +1,6 @@
-import { faDeleteLeft, faPen } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Component } from "react";
-import { Button, Card } from "react-bootstrap";
-
-class List extends Component{
-    constructor(props){
-        super(props);
-        this.handleChange=this.handleChange.bind(this);
-    }
-
-    handleChange(e){
-        this.props.onHandleChange(e.target.name);
-        // e.preventDefault();
-    }
-    render(){
-        if(this.props.selectedTasks==="All"){
-            return this.props.tasks.map(list=>
-                    <li key={list.id} style={{marginBottom:"10px",listStyle:"none"}}>
-                        <Card>
-                            <Card.Body>
-                                <span style={{position:"absolute",left:"20px",top:"2px"}}>{list.task}</span>
-                                <span style={{position:"absolute",right:"50px",top:"2px"}}><input name={list.id} type="checkbox" checked={list.done} onChange={this.handleChange} style={{marginRight:"5px"}} /><button style={{border:"none",background:"white"}}><FontAwesomeIcon style={{marginRight:"5px"}} icon={faPen}/></button><button style={{border:"none",background:"white"}}><FontAwesomeIcon style={{marginRight:"5px"}} icon={faDeleteLeft} /></button></span>
-                            </Card.Body>
-                        </Card>
-                    </li>
-            );
-        }
-        else if(this.props.selectedTasks==="Done"){
-            return this.props.tasks.map(list=>{
-                if(list.done===true){
-                    return <li key={list.id} style={{marginBottom:"10px",listStyle:"none"}}>
-                                <Card>
-                                    <Card.Body>
-                                        <span style={{position:"absolute",left:"20px",top:"2px"}}>{list.task}</span>
-                                        <span style={{position:"absolute",right:"50px",top:"2px"}}><input type="checkbox" checked={list.done} onChange={this.handleChange} style={{marginRight:"5px"}} /><button style={{border:"none",background:"white"}}><FontAwesomeIcon style={{marginRight:"5px"}} icon={faPen}/></button><button style={{border:"none",background:"white"}}><FontAwesomeIcon style={{marginRight:"5px"}} icon={faDeleteLeft} /></button></span>
-                                    </Card.Body>
-                                </Card>
-                            </li>
-                }
-            });
-        }return this.props.tasks.map(list=>{
-            if(list.done!==true){
-                return <li key={list.id} style={{marginBottom:"10px",listStyle:"none"}}>
-                            <Card>
-                                <Card.Body>
-                                    <span style={{position:"absolute",left:"20px",top:"2px"}}>{list.task}</span>
-                                    <span style={{position:"absolute",right:"50px",top:"2px"}}><input type="checkbox" checked={list.done} onChange={this.handleChange} style={{marginRight:"5px"}} /><button style={{border:"none",background:"white"}}><FontAwesomeIcon style={{marginRight:"5px"}} icon={faPen}/></button><button style={{border:"none",background:"white"}}><FontAwesomeIcon style={{marginRight:"5px"}} icon={faDeleteLeft} /></button></span>
-                                </Card.Body>
-                            </Card>
-                        </li>
-            }
-        });
-
-    }
-}
+import { Button } from "react-bootstrap"; 
+import List from "./Lists";
 
 class ToDoList extends Component{
     constructor(props){
@@ -63,6 +10,7 @@ class ToDoList extends Component{
         }
         this.handleTasks=this.handleTasks.bind(this);
         this.handleCheck=this.handleCheck.bind(this);
+        this.handleSavedChange=this.handleSavedChange.bind(this);
     }
 
     handleTasks(e){
@@ -74,6 +22,10 @@ class ToDoList extends Component{
 
     handleCheck(val){
         this.props.onChangingCheck(val);
+    }
+
+    handleSavedChange(val){
+        this.props.onChangingTask(val);
     }
 
     render(){
@@ -91,7 +43,10 @@ class ToDoList extends Component{
                     </div>
                 </div>
 
-                <ul style={{width:"70%",padding:"30px",marginLeft:"15%"}}><List tasks={this.props.tasks} selectedTasks={this.state.selectedTasks} onHandleChange={this.handleCheck}/></ul>
+                <ul style={{width:"70%",padding:"30px",marginLeft:"15%"}}><List tasks={this.props.tasks}
+                 selectedTasks={this.state.selectedTasks}
+                  onHandleChange={this.handleCheck}
+                  onSavingChanges={this.handleSavedChange} /></ul>
 
                 {/* Buttons to delete tasks */}
                 <div className="container" style={{alignItems:"center",margin:"auto",width:"60%",padding:"30px"}}>
