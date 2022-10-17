@@ -14,6 +14,8 @@ class ToDO extends Component{
     this.handleAddingTask=this.handleAddingTask.bind(this);
     this.handleCheck=this.handleCheck.bind(this);
     this.handleChangedTask=this.handleChangedTask.bind(this);
+    this.handleDelete=this.handleDelete.bind(this);
+    this.handleDeleteTask=this.handleDeleteTask.bind(this);
   }
 
   handleAddingTask(val){
@@ -29,7 +31,7 @@ class ToDO extends Component{
       this.setState({
         tasks:arr
       });
-    } alert(`Empty task like your life. Please make some choices!`)
+    }else alert(`Empty task like your life. Please make some choices!`)
   }
 
   handleCheck(val){
@@ -47,6 +49,35 @@ class ToDO extends Component{
     });
   }
 
+  handleDelete(val){
+    const idx=parseInt(val);
+    let arr=this.state.tasks,n=1;
+    arr.splice(idx-1,1);
+    arr.forEach(element => {
+      element.id=n;
+      n++;
+    });
+
+    this.setState({
+      tasks:arr
+    })
+  }
+
+  handleDeleteTask(val){
+    let arr=this.state.tasks;
+    if(val==="All"){
+      arr.splice(0,arr.length);
+      this.setState({
+        tasks:arr
+      });
+    }else{
+      var filtered=arr.filter((value)=>{return value.done===false});
+      this.setState({
+        tasks:filtered
+      });
+    }
+  }
+
   render(){
     return (
       <>
@@ -54,7 +85,9 @@ class ToDO extends Component{
         <ToDoInput onAddingTask={this.handleAddingTask} />
         <ToDoList  tasks={this.state.tasks}
          onChangingCheck={this.handleCheck}
-         onChangingTask={this.handleChangedTask}/>
+         onChangingTask={this.handleChangedTask}
+         onHandleDeleteListItem={this.handleDelete}
+         onHandleDeleteTasks={this.handleDeleteTask}/>
       </div>
       </>
     );
