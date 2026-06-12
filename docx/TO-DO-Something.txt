@@ -1,0 +1,47 @@
+# 🚀 Project: To-Do Something (Modern Full-Stack Rebuild)
+
+An ultra-lightweight, high-performance task management application migrated from legacy React architectures into a modern, context-driven frontend. This project is currently scaling into a secure, full-stack collaborative ecosystem.
+
+---
+
+## 🏛️ Project Evolution & Architectural Audit
+
+### 1. The Legacy Base (Decommissioned)
+Originally constructed using classical React paradigms:
+* **Class Components & Lifecycle Methods:** Heavily reliant on class constructs and manual performance tuning.
+* **The Binding Trap:** State updates required intensive constructor declarations and explicit function binding (`this.method.bind(this)`).
+* **Prop-Drilling Architecture:** State manipulation was bound to parental components, forcing intermediate UI layouts to act as passive data couriers.
+* **Direct State Mutation:** Task arrays were manipulated using invasive native methods (`splice`/`push`), creating tracking inefficiencies within the virtual DOM.
+
+### 2. The Modern Core (Current State)
+The frontend has been entirely stripped and refactored to conform to production-grade design principles:
+* **Build Tooling:** Replaced Create React App (`react-scripts`) with **Vite** for near-instantaneous compilation and hot module reloading.
+* **State Decoupling (`useReducer`):** Extracted business logic out of UI components into an isolated pure-function state machine (`todoReducer.js`).
+* **Global State Broadcast (Context API):** Engineered a global broadcast station (`TodoProvider`) to entirely eliminate prop-drilling pipelines, enabling clean, direct consumer subscriptions via `useContext`.
+* **Immutability Filters:** Rewrote row array rendering to safely utilize automated pipeline maps (`.filter().map()`), optimizing frame rendering behaviors.
+
+---
+
+## 🗺️ Engineering Roadmap
+
+The project is structured across modular implementation milestones:
+
+| Phase | Milestone Description | Tech Stack Components | Status |
+| :--- | :--- | :--- | :--- |
+| **Phase 1** | Local Environment & Bundler Migration | Vite, React 18, Native Shell | 🟩 Complete |
+| **Phase 2** | State Machine & Context Injection | `useReducer`, `useContext`, Functional Hooks | 🟩 Complete |
+| **Phase 3** | Authentication & Relational Storage | Node.js, Express, JWT (JSON Web Tokens), MongoDB/PostgreSQL | 🟨 Next Up |
+| **Phase 4** | Real-Time Live Multi-User Sharing | WebSockets (`Socket.io`) / Bi-directional Sync | 🟦 Planned |
+
+---
+
+## ⚡ Local Setup and Execution
+
+To run this environment locally, ensure you have **Node.js (v24+)** initialized, then execute:
+
+```bash
+# Install the modern, optimized dependencies
+npm install
+
+# Run the local development server
+npm run dev

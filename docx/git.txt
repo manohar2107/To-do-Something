@@ -1,0 +1,21 @@
+# 1. Initialize this folder as a local Git repository
+git init
+
+# 2. Check which files are ready to be saved (they should appear green/tracked, excluding node_modules)
+git status
+
+# 3. Stage all your fresh, lightweight files
+git add .
+
+# 4. Commit your changes locally with a descriptive message
+git commit -m "Refactor: Migrate from legacy Class Components to clean Vite, useReducer, and Context API"
+
+# 5. Point your local repository to your remote GitHub repository URL
+git remote add origin https://github.com/manohar2107/To-do-Something.git
+
+# 6. Rename the default branch to 'main'
+git branch -M main
+
+# 7. Push your fresh modern codebase up to GitHub
+# Note: If your remote repo already has old files, use the '-f' flag to overwrite them with this fresh version
+git push -u origin main -f
