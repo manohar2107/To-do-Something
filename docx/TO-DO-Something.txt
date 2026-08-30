@@ -45,3 +45,20 @@ npm install
 
 # Run the local development server
 npm run dev
+
+Phase 3: The Gateway — Node.js, Express, & Shared Database
+To build your killer feature—allowing 2 or more users to view and modify the exact same to-do list simultaneously—we need a centralized supervisor. A browser's local storage can't talk to another browser across the world, but a backend server can.
+
+Here is how our full-stack universe is going to be structured:
+
+[ Client A (Vite App) ] ──(HTTP/WebSockets)──┐
+                                              ▼
+                                    [ Server (Node + Express) ] ──> [ Database ]
+                                              ▲
+[ Client B (Vite App) ] ──(HTTP/WebSockets)──┘
+The Backend Strategy
+To keep your project clean and contained in your single GitHub repository, we will create a parallel server workspace. Your project root will seamlessly handle both sides of the ball:
+
+src/, public/, etc. -> Frontend Client (Vite)
+
+server/ -> Backend API (Node.js + Express)

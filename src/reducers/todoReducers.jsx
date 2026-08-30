@@ -4,6 +4,12 @@ export const initialState = {
 
 export function todoReducer(state, action) {
   switch (action.type) {
+    case 'SET_TASKS':
+      return {
+        ...state,
+        tasks: action.payload // Replace with fetched tasks from server
+      };
+
     case 'ADD_TASK':
       if (!action.payload.trim()) {
         alert("Empty task like your life. Please make some choices!");

@@ -3,11 +3,15 @@ import { TodoContext } from "../context/TodoContext";
 
 export default function ToDoInput(){
     const [task, setTask] = useState("");
-    const {dispatch} = useContext(TodoContext);
+    const {addTask} = useContext(TodoContext);
 
     function handleAddTask(evt){
         evt.preventDefault();
-        dispatch({type:"ADD_TASK", payload: task});
+        if(!task.trim()){
+            alert("Empty task like your life. Please make some choices!");
+            return;
+        }
+        addTask(task);
         setTask("");
     };
     

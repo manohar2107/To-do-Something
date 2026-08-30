@@ -12,7 +12,7 @@ function ListItem({ list, onToggle, onStartEdit, onDelete }) {
           <input 
             type="checkbox" 
             checked={list.done} 
-            onChange={() => onToggle(list.id)} 
+            onChange={() => onToggle(list.id,list.done)} 
           />
           <button onClick={() => onStartEdit(list)} className="edit-btn">✏️</button>
           <button onClick={() => onDelete(list.id)} className="delete-btn">🗑️</button>
@@ -23,7 +23,7 @@ function ListItem({ list, onToggle, onStartEdit, onDelete }) {
 }
 
 export default function List({selectedTasks }) {
-    const {tasks, dispatch} = useContext(TodoContext);
+    const {tasks, toggleTask, editTaskText, deleteTask} = useContext(TodoContext);
   const [editingTask, setEditingTask] = useState(null);
   const [editText, setEditText] = useState("");
 
@@ -33,7 +33,7 @@ export default function List({selectedTasks }) {
   };
 
   const saveChanges = () => {
-    dispatch({ type: "EDIT_TASK", payload: { id: editingTask.id, newTask: editText } });
+    editTaskText(editingTask.id, editText);
     setEditingTask(null);
   };
 
@@ -54,9 +54,9 @@ export default function List({selectedTasks }) {
         <ListItem 
           key={list.id} 
           list={list} 
-          onToggle={(id) => dispatch({ type: "TOGGLE_TASK", payload:id })}
+          onToggle={toggleTask}
           onStartEdit={startEdit} 
-          onDelete={(id) => dispatch({ type: "DELETE_TASK", payload:id })} 
+          onDelete={deleteTask} 
         />
       ))}
 

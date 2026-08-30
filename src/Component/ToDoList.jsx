@@ -4,7 +4,7 @@ import { TodoContext } from '../context/TodoContext';
 
 export default function ToDoList() {
   const [selectedTasks, setSelectedTasks] = useState("All");
-  const {dispatch} = useContext(TodoContext);
+  const {massDelete} = useContext(TodoContext);
 
   return (
     <article>
@@ -23,8 +23,8 @@ export default function ToDoList() {
 
       {/* Mass Delete Buttons */}
       <div className="delete-container">
-        <button className="danger-btn" onClick={() => {dispatch({type:"MASS_DELETE", payload: "All"})}}>Delete All Tasks</button>
-        <button className="danger-btn" onClick={() => {dispatch({type:"MASS_DELETE", payload: "Done"})}}>Delete Done Tasks</button>
+        <button className="danger-btn" onClick={() => massDelete("All")}>Delete All Tasks</button>
+        <button className="danger-btn" onClick={() => massDelete("Done")}>Delete Done Tasks</button>
       </div>
     </article>
   );
