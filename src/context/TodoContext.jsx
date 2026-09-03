@@ -9,6 +9,7 @@ export const TodoProvider = ({ children }) => {
   // 1. READ (Initial Load)
   useEffect(() => {
     const fetchTasks = async () => {
+      console.log('useEffect: Fetching tasks from server...');
       try {
         const response = await fetch('/api/tasks');
         const data = await response.json();
@@ -26,14 +27,17 @@ export const TodoProvider = ({ children }) => {
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ task: text })
+        body: JSON.stringify({ task:text })
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || errorData.error || "Failed to create task");
+      }
+
       const newServerTask = await response.json();
-      
-      // 🌟 FIX: Append the new task and force a brand new array reference instantly
       setTasks((prevTasks) => [...prevTasks, newServerTask]);
     } catch (err) {
-      console.error("Error adding task:", err);
+      console.error("❌ Add Task Failed:", err.message);
     }
   };
 
@@ -49,7 +53,7 @@ export const TodoProvider = ({ children }) => {
       
       // 🌟 FIX: Swap the targeted item inline, creating a reactive layout refresh
       setTasks((prevTasks) =>
-        prevTasks.map((t) => (t.id === id ? updatedTask : t))
+        prevTasks.map((t) => ((t.id || t._id) === id ? updatedTask : t))
       );
     } catch (err) {
       console.error("Error toggling task:", err);
@@ -67,7 +71,7 @@ export const TodoProvider = ({ children }) => {
       const updatedTask = await response.json();
 
       setTasks((prevTasks) =>
-        prevTasks.map((t) => (t.id === id ? updatedTask : t))
+        prevTasks.map((t) => ((t.id || t._id) === id ? updatedTask : t))
       );
     } catch (err) {
       console.error("Error updating text:", err);
@@ -77,10 +81,12 @@ export const TodoProvider = ({ children }) => {
   // 5. DELETE (Remove Single Task)
   const deleteTask = async (id) => {
     try {
-      await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+      const result = await response.json();
       
       // 🌟 FIX: Filter out the deleted ID, forcing an instant row pop
-      setTasks((prevTasks) => prevTasks.filter((t) => t.id !== id));
+      setTasks((prevTasks) => prevTasks.filter((t) => (t.id || t._id) !== id));
+      console.log(result.message);
     } catch (err) {
       console.error("Error deleting task:", err);
     }

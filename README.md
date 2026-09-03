@@ -14,8 +14,13 @@ A decoupled, high-performance task management application migrated from legacy R
 │  Local Loopback TCP Socket
 ▼
 [ Express.js Server (Port 5000) ] ──► [ In-Memory Data Store (Single Source of Truth) ]
+│
+│  Mongoose ODM (with Google DNS SRV Resolution)
+▼
+[ MongoDB Atlas Cloud Cluster ] ──► [ Persistent Document Collection: 'tasks' ]
 
 ### Core Design Principles
+* **Cloud Database Persistence:** Server state transitions are fully persistent, backed by a managed multi-node replica set in MongoDB Atlas.
 * **Server-Authoritative State:** The backend acts as the authoritative state machine responsible for ID allocation, data mutations, and filtering logic.
 * **Reactive Frontend Cache:** The React client acts as a lightweight local cache subscribed via Context API, enforcing immutable state transitions (`[...prev, data]`) for optimal Virtual DOM reconciliation.
 * **Zero-CORS Development Proxy:** Vite acts as a reverse proxy during development, routing relative paths (`/api/*`) seamlessly to Express on port `5000`.
@@ -26,19 +31,20 @@ A decoupled, high-performance task management application migrated from legacy R
 
 * **Frontend:** React 18, Vite, Context API, Hooks (`useState`, `useEffect`, `useContext`)
 * **Backend:** Node.js (ES Modules), Express.js, CORS, Dotenv
+* **Database & ODM:** MongoDB Atlas (Cloud M0 Cluster), Mongoose 8+
 * **Dev Tools:** Nodemon, Git, Browser DevTools
 
 ---
 
 ## 📡 API Specification
 
-| Method | Endpoint | Request Body | Status Code | Description |
+| Method | Endpoint | Request Body | Success Code | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| **`GET`** | `/api/tasks` | *None* | `200 OK` | Retrieves all active tasks. |
-| **`POST`** | `/api/tasks` | `{"task": "string"}` | `201 Created` | Appends a new task with a server-generated ID. |
-| **`PATCH`** | `/api/tasks/:id` | `{"done": boolean}` or `{"task": "string"}` | `200 OK` | Updates status or text content by ID. |
-| **`DELETE`** | `/api/tasks/:id` | *None* | `200 OK` | Purges a specific task by ID. |
-| **`POST`** | `/api/tasks/mass-delete` | `{"type": "All" \| "Done"}` | `200 OK` | Batch deletes completed or all tasks. |
+| **`GET`** | `/api/tasks` | *None* | `200 OK` | Hydrates tasks sorted by `createdAt` descending. |
+| **`POST`** | `/api/tasks` | `{"task": "string"}` | `201 Created` | Validates text and persists a new document. |
+| **`PATCH`** | `/api/tasks/:id` | `{"done": boolean}` or `{"task": "string"}` | `200 OK` | Updates status or text by validated ObjectId. |
+| **`DELETE`** | `/api/tasks/:id` | *None* | `200 OK` | Removes document matching ObjectId. |
+| **`POST`** | `/api/tasks/mass-delete` | `{"type": "All" \| "Done"}` | `200 OK` | Executes batch document purge via `deleteMany()`. |
 
 ---
 
@@ -56,3 +62,11 @@ npm install
 
 # Launch with Nodemon auto-reload
 npm run dev
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the `server/` directory:
+
+```env
+PORT=5000
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/todo_database?retryWrites=true&w=majority

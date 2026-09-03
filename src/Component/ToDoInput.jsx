@@ -11,7 +11,7 @@ export default function ToDoInput(){
             alert("Empty task like your life. Please make some choices!");
             return;
         }
-        addTask(task);
+        addTask(task.trim());
         setTask("");
     };
     

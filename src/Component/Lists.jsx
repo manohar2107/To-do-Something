@@ -2,6 +2,7 @@ import React, { useState,useContext } from 'react';
 import {TodoContext} from "../context/TodoContext";
 
 function ListItem({ list, onToggle, onStartEdit, onDelete }) {
+  const taskId=list.id || list._id; // Fallback for mongoDB's _id if id is not present
   return (
     <li style={{ marginBottom: "10px", listStyle: "none" }} className="todo-card">
       <div className="todo-card-body">
@@ -12,10 +13,11 @@ function ListItem({ list, onToggle, onStartEdit, onDelete }) {
           <input 
             type="checkbox" 
             checked={list.done} 
-            onChange={() => onToggle(list.id,list.done)} 
+            onChange={() => onToggle(
+              taskId,list.done)} 
           />
-          <button onClick={() => onStartEdit(list)} className="edit-btn">✏️</button>
-          <button onClick={() => onDelete(list.id)} className="delete-btn">🗑️</button>
+          <button onClick={() => taskId && onStartEdit(list)} className="edit-btn">✏️</button>
+          <button onClick={() => taskId && onDelete(taskId)} className="delete-btn">🗑️</button>
         </div>
       </div>
     </li>
@@ -33,7 +35,8 @@ export default function List({selectedTasks }) {
   };
 
   const saveChanges = () => {
-    editTaskText(editingTask.id, editText);
+    const taskId = editingTask.id || editingTask._id; // Fallback for mongoDB's _id if id is not present
+    editTaskText(taskId, editText);
     setEditingTask(null);
   };
 
@@ -52,7 +55,7 @@ export default function List({selectedTasks }) {
     <>
       {filteredTasks.map(list => (
         <ListItem 
-          key={list.id} 
+          key={list.id || list._id} 
           list={list} 
           onToggle={toggleTask}
           onStartEdit={startEdit} 

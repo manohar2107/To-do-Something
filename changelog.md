@@ -5,6 +5,21 @@
 All notable changes to the **To-Do Something** project will be documented in this file.
 
 ---
+## [0.3.0] - 2026-09-03
+
+### Added
+* **MongoDB Atlas Integration:** Swapped ephemeral in-memory storage for a persistent MongoDB Atlas cloud database cluster using Mongoose ODM.
+* **Mongoose Task Schema:** Implemented `Task` schema (`server/models/Task.js`) with validation constraints for `task` (required, trimmed), `done` (boolean flag), and automatic `timestamps`.
+* **DNS Resolution Fix:** Added native Node.js DNS override (`dns.setServers(['8.8.8.8', '8.8.4.4'])`) to bypass residential ISP blocking of DNS SRV records for `+srv` connection strings.
+* **ObjectId Validation Guards:** Introduced `mongoose.Types.ObjectId.isValid` parameter checks across `PATCH` and `DELETE` endpoints to reject malformed IDs before executing queries.
+
+### Changed
+* **Mongoose 8+ Driver Compliance:** Migrated update queries from the deprecated `{ new: true }` option to `{ returnDocument: 'after' }` in `findByIdAndUpdate()`.
+* **Cross-Property ID Resilience:** Updated `TodoContext.jsx` and `Lists.jsx` to resolve IDs defensively using `(t.id || t._id)` to avoid synchronization failures between Mongoose documents and frontend state.
+* **Strict Response Verification:** Added `response.ok` validation guards across all context network handlers, preventing server error payloads from being written to client state.
+* **Input State Normalization:** Normalized checkbox checked bindings using `Boolean(list.done)` to prevent React controlled-to-uncontrolled input conversion warnings.
+
+---
 
 ## [0.2.0] - 2026-08-30
 
