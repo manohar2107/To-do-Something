@@ -7,3 +7,4 @@ dist/
 .vite/
 .env
 .DS_Store
+Deploy.md

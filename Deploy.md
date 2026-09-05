@@ -18,3 +18,28 @@ When deploying to Google Cloud Run, your raw JavaScript files are packaged and e
        │  3. Executes CMD ["npm", "start"] -> Node.js event loop boots
        ▼
 [ Google Global Load Balancer ] ──► Exposes public HTTPS endpoint (auto-scales to 0 when idle)
+
+Deplyoing Steps:
+# 1. Ensure you are on main with all latest changes committed
+git checkout main
+
+# 2. Create and switch to a new branch named 'depl'
+git checkout -b dep
+
+# 3. Push the new deploy branch to GitHub
+git push -u origin dep
+
+Cut and Push the Release Tag from the Deploy Branch:
+# 4. Verify you are on the deploy branch
+git branch --show-current
+
+# 5. Create the annotated release tag
+git tag -a v0.3.0 -m "Release v0.3.0: Cloud Run containerized backend with MongoDB Atlas"
+
+# 6. Push the tag to GitHub
+git push origin v0.3.0
+
+Example:
+Service [todo-something] revision [todo-something-00003-c7r] has been deployed and is serving 100 percent of traffic.
+Service URL: https://todo-something-714330462911.asia-south2.run.app
+Proxy locally with: gcloud run services proxy todo-something --region asia-south2 --project todoserver-507719
