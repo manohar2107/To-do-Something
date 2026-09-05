@@ -9,7 +9,7 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/todo_database';
 
 // Connect to MongoDB
@@ -108,6 +108,6 @@ app.post('/api/tasks/mass-delete', async(req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port:  http://localhost:${PORT}`);
 })
