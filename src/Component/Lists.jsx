@@ -41,7 +41,8 @@ export default function List({selectedTasks }) {
   };
 
   // Filter tasks inline using cleaner logic
-  const filteredTasks = tasks.filter(t => {
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const filteredTasks = safeTasks.filter(t => {
     if (selectedTasks === "Done") return t.done;
     if (selectedTasks === "ToDo") return !t.done;
     return true; // "All"

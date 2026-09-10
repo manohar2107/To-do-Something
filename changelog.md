@@ -5,21 +5,33 @@
 All notable changes to the **To-Do Something** project will be documented in this file.
 
 ---
-## [Unreleased] - 2026-09-08
+## [v1.0.0] - 2026-09-11
 
 ### Added
 - **JWT Authentication Pipeline**: Created `/api/auth/register`, `/api/auth/login`, and `/api/auth/me` routes with token generation and session hydration.
 - **User Model & Security**: Implemented `User` schema with unique `username` validation, automatic `theme` preference assignment, and `bcryptjs` password hashing.
 - **Token Verification Middleware**: Added `authenticateToken` middleware to decode Bearer tokens, query the authenticated user, and inject `req.user` into downstream handlers.
 - **Database Environment Isolation**: Separated local development data into a dedicated `todo_dev` database on MongoDB Atlas via environment variables to protect production records.
+- **Full-Stack Authentication Lifecycle**: End-to-end registration, login, session persistence, and logout flow using JWT.
+- **Client Session Management (`AuthContext`)**: React context managing tokens in `localStorage` and automatic re-authentication via `/api/auth/me`.
+- **User-Scoped Task Access**: MongoDB queries and task mutations strictly bound to `req.user._id` via backend `protect` middleware.
+- **Defensive Error Handling**: Safe state fallbacks across `TodoContext` and `Lists` preventing UI crashes on failed or non-array network responses.
 
 ### Changed
 - **Task Route Scoping**: Mounted all `/api/tasks` endpoints behind the `authenticatedToken` middleware and isolated queries and creations to `req.user._id`.
 - **Express Middleware Ordering**: Restructured `server.js` to ensure `express.json()` and `cors()` execute prior to route handlers.
+- **Express Route Ordering**: Restructured `taskRoutes.js` to evaluate specific operational endpoints (`/mass-delete`) before dynamic parameter paths (`/:id`).
+- **HTTP Method Parity**: Expanded route handlers to support both `PATCH` and `PUT` for updates, and both `POST` and `DELETE` for bulk removals.
+- **Payload Normalization**: Case-insensitive parsing for mass delete operations (`"done"` vs `"Done"`).
 
 ### Fixed
 - Resolved `TypeError: next is not a function` in `User.js` by migrating the `pre('save')` hook to a modern promise-based async implementation without `next()`.
 - Removed legacy unauthenticated task route handlers directly declared inside `server.js`.
+
+### Security
+- **Multi-Tenant Isolation**: Verified complete separation of user data across concurrent browser sessions.
+- **Credential Storage**: Automated password hashing using `bcryptjs` with salt rounds in pre-save document hooks.
+- **Environment Separation**: Local development isolated to dedicated `todo_dev` database on MongoDB Atlas.
 
 ## [0.3.0] - 2026-09-03
 

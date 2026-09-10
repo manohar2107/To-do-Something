@@ -1,104 +1,148 @@
 import express from 'express';
-import {Task} from '../models/Task.js';
+import { Task } from '../models/Task.js'; // Adjust if your model uses a default export
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.use(authenticateToken); // Apply authentication middleware to all routes in this router
+// Enforce authentication across all task routes
+router.use(authenticateToken);
 
-// GET /api/tasks - Get all tasks  
-router.get('/', async (req, res) => {
-  try {
-    const tasks = await Task.find({
-        $or:[{owner:req.user._id},{sharedWith:req.user._id }],
-    }).sort({ createdAt: -1 });
-    res.status(200).json(tasks);
-    } catch (err) {
-    console.error("Error fetching tasks:", err);
-    res.status(500).json({ message: "Internal server error " + err.message });
-  }
-});
-
-// POST /api/tasks - Create a new task
-router.post('/', async (req, res) => {
-  try {
-    const { task ,imageURL} = req.body;
-    if (!task) return res.status(400).json({ message: "please provide an useful activity" });
-
-    const newTask= await Task.create({task,imageURL:imageURL||null,done:false,owner:req.user._id,sharedWith:[]});
-
-    res.status(201).json(newTask);
-  } catch (err) {
-    console.error("Error adding task:", err);
-    res.status(500).json({ message: "Internal server error " + err.message });
-  }
-});
-
-router.put('/:id', async (req, res) => {
+// 1. Root task routes: GET all tasks, POST a new task
+router
+  .route('/')
+  .get(async (req, res) => {
     try {
-        const task  = await Task.findById(req.params.id);
-        if (!task) {
-            return res.status(404).json({ message: 'Task not found' });
-        }
-
-        const isOwner = task.owner.toString() === req.user._id.toString();
-        const isSharedWithUser = task.sharedWith.some(userId => userId.toString() === req.user._id.toString());
-
-        if (!isOwner && !isSharedWithUser) {
-            return res.status(403).json({ message: 'Bad Elements of Soceity' });
-        }
-
-        if(req.body.task !== undefined) task.task = req.body.task;
-        if(req.body.done !== undefined) task.done = req.body.done;
-
-        const updatedTask = await task.save();
-        res.status(200).json(updatedTask);
+      const tasks = await Task.find({ owner: req.user._id }).sort({ createdAt: -1 });
+      res.json(tasks);
     } catch (err) {
-        console.error("Error updating task:", err);
-        res.status(500).json({ message: "Internal server error " + err.message });
+      res.status(500).json({ error: 'Failed to fetch tasks: ' + err.message });
     }
-}); 
+  })
+  .post(async (req, res) => {
+    try {
+      const { task } = req.body;
 
-router.delete('/all', async (req, res) => {
+      if (!task || !task.trim()) {
+        return res.status(400).json({ error: 'Task content cannot be empty' });
+      }
+
+      const newTask = await Task.create({
+        task: task.trim(),
+        owner: req.user._id,
+        done: false,
+      });
+
+      res.status(201).json(newTask);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to create task: ' + err.message });
+    }
+  });
+
+// 2. Mass operations (CRITICAL: Declared BEFORE /:id to prevent routing collision)
+router
+  .route('/mass-delete')
+  .post( async (req, res) => {
   try {
-    const result = await Task.deleteMany({ owner: req.user._id });
-    res.status(200).json({ message: `${result.deletedCount} tasks deleted successfully` });
-    } catch (error) {
-    console.error("Error deleting all tasks:", error);
-    res.status(500).json({ message: "Internal server error " + error.message });
-  }
-});
+    const { type } = req.body;
+    // Normalize casing ("Done" -> "done", "All" -> "all")
+    const mode = type ? type.toLowerCase() : '';
 
-router.delete('/done', async (req, res) => {
-  try {
-    const result = await Task.deleteMany({ owner: req.user._id, done: true });  
-    res.status(200).json({ message: `${result.deletedCount} completed tasks deleted successfully` });
-  } catch (error) {
-    console.error("Error deleting done tasks:", error);
-    res.status(500).json({ message: "Internal server error " + error.message });
-  }
-});
+    let query = { owner: req.user._id };
 
-
-router.delete('/:id', async (req, res) => {
-  try {
-    const task = await Task.findById(req.params.id);
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
+    if (mode === 'done') {
+      query.done = true;
+    } else if (mode === 'all') {
+      // Intentionally leave query as { owner: req.user._id }
+    } else {
+      return res.status(400).json({ error: 'Invalid delete type provided.' });
     }
 
-    const isOwner = task.owner.toString() === req.user._id.toString();
-    // const isSharedWithUser = task.sharedWith.some(userId => userId.toString() === req.user._id.toString());
+    const result = await Task.deleteMany(query);
 
-    if (!isOwner) {
-      return res.status(403).json({ message: 'Bad Elements of Soceity' });
-    }
-
-    await task.deleteOne();
-    res.status(200).json({ message: 'Task deleted successfully', id: req.params.id });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete task: ' + error.message });
+    res.json({
+      message: 'Tasks cleared successfully',
+      deletedCount: result.deletedCount,
+      mode,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mass delete: ' + err.message });
   }
-});
+})
+  .delete(async (req, res) => {
+    // Fallback support if frontend dispatches standard DELETE
+    try {
+      const { type } = req.query;
+      let query = { owner: req.user._id };
+
+      if (type === 'done') {
+        query = {
+          owner: req.user._id,
+          $or: [{ done: true }, { completed: true }],
+        };
+      }
+
+      const result = await Task.deleteMany(query);
+      res.json({
+        message: 'Tasks cleared successfully',
+        deletedCount: result.deletedCount,
+      });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to mass delete: ' + err.message });
+    }
+  });
+
+// 3. Individual task operations by ID
+router
+  .route('/:id')
+  .patch(async (req, res) => {
+    try {
+      const task = await Task.findOneAndUpdate(
+        { _id: req.params.id, owner: req.user._id },
+        req.body,
+        { new: true, runValidators: true }
+      );
+
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found or unauthorized' });
+      }
+
+      res.json(task);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to update task: ' + err.message });
+    }
+  })
+  .put(async (req, res) => {
+    try {
+      const task = await Task.findOneAndUpdate(
+        { _id: req.params.id, owner: req.user._id },
+        req.body,
+        { new: true, runValidators: true }
+      );
+
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found or unauthorized' });
+      }
+
+      res.json(task);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to update task: ' + err.message });
+    }
+  })
+  .delete(async (req, res) => {
+    try {
+      const task = await Task.findOneAndDelete({
+        _id: req.params.id,
+        owner: req.user._id,
+      });
+
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found or unauthorized' });
+      }
+
+      res.json({ message: 'Task deleted successfully', id: req.params.id });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to delete task: ' + err.message });
+    }
+  });
 
 export default router;

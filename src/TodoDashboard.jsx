@@ -3,7 +3,7 @@ import './App.css';
 import ToDoInput from './Component/ToDoInput';
 import ToDoList from './Component/ToDoList';
 
-export default function ToDO() {
+export default function TodoDashboard() {
   return (
     <div className='App'>
       <ToDoInput />
