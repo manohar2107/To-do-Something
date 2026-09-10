@@ -5,6 +5,22 @@
 All notable changes to the **To-Do Something** project will be documented in this file.
 
 ---
+## [Unreleased] - 2026-09-08
+
+### Added
+- **JWT Authentication Pipeline**: Created `/api/auth/register`, `/api/auth/login`, and `/api/auth/me` routes with token generation and session hydration.
+- **User Model & Security**: Implemented `User` schema with unique `username` validation, automatic `theme` preference assignment, and `bcryptjs` password hashing.
+- **Token Verification Middleware**: Added `authenticateToken` middleware to decode Bearer tokens, query the authenticated user, and inject `req.user` into downstream handlers.
+- **Database Environment Isolation**: Separated local development data into a dedicated `todo_dev` database on MongoDB Atlas via environment variables to protect production records.
+
+### Changed
+- **Task Route Scoping**: Mounted all `/api/tasks` endpoints behind the `authenticatedToken` middleware and isolated queries and creations to `req.user._id`.
+- **Express Middleware Ordering**: Restructured `server.js` to ensure `express.json()` and `cors()` execute prior to route handlers.
+
+### Fixed
+- Resolved `TypeError: next is not a function` in `User.js` by migrating the `pre('save')` hook to a modern promise-based async implementation without `next()`.
+- Removed legacy unauthenticated task route handlers directly declared inside `server.js`.
+
 ## [0.3.0] - 2026-09-03
 
 ### Added

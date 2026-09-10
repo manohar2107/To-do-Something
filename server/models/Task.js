@@ -1,24 +1,36 @@
 import mongoose from 'mongoose';
 
-const taskSchema = new mongoose.Schema({
-  task: {
-    type: String,
-    required: [true, "Task content is required"],
-    trim: true,
-  },
-  done: {
-    type: Boolean,
-    default: false,
-  },
-}, { timestamps: true,
-    toJson:{
-        transform: function(doc, ret){
-            ret.id = ret._id;
-            delete ret._id;
-            delete ret.__v;
-            return ret;
-        },
+const taskSchema = new mongoose.Schema(
+  {
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
- });
+    // Array of user IDs who have shared access to this task
+    sharedWith: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    task: {
+      type: String,
+      required: [true, 'Content is required'],
+      trim: true,
+    },
+    imageUrl: {
+      type: String,
+      default: null,
+    },
+    done: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
- export const Task = mongoose.model('Task', taskSchema);
+taskSchema.index({ owner: 1, sharedWith: 1 });
+
+export const Task = mongoose.model('Task', taskSchema);

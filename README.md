@@ -63,10 +63,25 @@ npm install
 # Launch with Nodemon auto-reload
 npm run dev
 
-## ⚙️ Environment Variables
 
-Create a `.env` file in the `server/` directory:
+---
 
-```env
-PORT=5000
-MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/todo_database?retryWrites=true&w=majority
+## 🌐 Production Cloud Architecture & CI/CD
+
+The application is deployed across a decoupled multi-cloud architecture:
+
+* **Frontend Hosting:** [Vercel](https://to-do-something-pearl.vercel.app) (Edge CDN with SPA fallbacks)
+* **Backend API:** [Google Cloud Run](https://todo-something-714330462911.asia-south2.run.app) (Serverless containerized Express service in `asia-south2`)
+* **Persistence:** [MongoDB Atlas](https://cloud.mongodb.com) (Multi-node M0 replica set)
+* **Reverse Proxy:** Configured via `vercel.json` to proxy `/api/*` requests directly to Cloud Run, eliminating cross-origin preflight latency and CORS restrictions.
+
+### Continuous Deployment Pipeline
+
+Deployments follow a strict Git tag promotion workflow to prevent unstable code from leaking into production:
+
+1. **Active Development:** All daily commits and feature experiments remain on `master`.
+2. **Release Staging:** Stable milestones are merged from `master` into the `deploy` branch.
+3. **Automated Builds:** Pushing an annotated tag matching `^v.*` (e.g., `git push origin v0.3.0`) triggers Google Cloud Build to:
+   * Build the production Docker image using `server/Dockerfile`.
+   * Push the container artifact to Google Artifact Registry.
+   * Roll out a zero-downtime revision on Google Cloud Run.

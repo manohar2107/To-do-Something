@@ -1,0 +1,8 @@
+ToDo(**):
+## integrate jwt tokenization for user access identification
+
+## also accept image an task element
+
+##Add Theme : multiple theme option and produce it to store with every user
+
+##Syncronising users sharing todo with other users( again can do that by keeping array of users the user want to keep with corresponding document)
