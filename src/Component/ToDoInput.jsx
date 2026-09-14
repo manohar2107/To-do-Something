@@ -1,5 +1,6 @@
 import React , { useState ,useContext } from "react";
 import { TodoContext } from "../context/TodoContext";
+import '../App.css';
 
 export default function ToDoInput(){
     const [task, setTask] = useState("");
@@ -16,14 +17,26 @@ export default function ToDoInput(){
     };
     
     return(
-        <article style={{padding:"20px"}}>
-            <h2 style={{textAlign:"center"}}>To-Do Input</h2>
-            <form onSubmit={handleAddTask} className="todo_form">
-                <div className="input-group">
-                    <input type="text" name="task" className="input-control" placeholder="Enter your task here..." value={task} onChange={(evt) => setTask(evt.target.value)} />
-                </div>
-                <button type="submit" className="add-btn">New Task</button>
-            </form>
-        </article>
+        <div className="input-card">
+            <textarea
+                className="task-textarea"
+                rows={3}
+                placeholder="What needs to be accomplished today?"
+                value={task}
+                onChange={(e) => setTask(e.target.value)}
+                onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleAddTask(e);
+                }
+                }}
+            />
+            <div className="button-row-center">
+                <button className="primary-btn" onClick={handleAddTask}>
+                    Add Task
+                </button>
+            </div>
+            
+        </div>
     );
 }

@@ -16,7 +16,8 @@ const userSchema = new mongoose.Schema({
   },
   theme: {
       type: String,
-      default: 'dark', // 👈 Gives every new user a default theme
+      enum: ['default', 'dark', 'indigo'],
+      default: 'default', // 👈 Gives every new user a default theme
     },
 }, { timestamps: true });
 

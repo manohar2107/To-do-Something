@@ -8,7 +8,7 @@ export const TodoProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
   const {token} = useAuth(); // Get the auth token from context
 
-  // 1. READ (Initial Load)
+  // Fetch (Initial Load)
   useEffect(() => {
     if (!token) {
       console.warn("No auth token found. Skipping task fetch.");
@@ -39,7 +39,7 @@ export const TodoProvider = ({ children }) => {
     fetchTasks();
   }, [token]);
 
-  // 2. CREATE (Add Task)
+  // post (Add Task)
   const addTask = async (taskText) => {
   if (!token || !taskText.trim()) return;
 
@@ -73,7 +73,7 @@ export const TodoProvider = ({ children }) => {
   }
 };
 
-  // 3. UPDATE (Toggle Complete Status)
+  // patch/put (Toggle Complete Status)
   const toggleTask = async (id, currentDoneStatus) => {
     if(!token) { 
       console.warn("Who are ya!!!!(No Auth key)");
@@ -97,7 +97,7 @@ export const TodoProvider = ({ children }) => {
     }
   };
 
-  // 4. UPDATE (Edit Text Content)
+  // patch/put (Edit Text Content)
   const editTaskText = async (id, newText) => {
     if(!token) { 
       console.warn("Who are ya!!!!(No Auth key)");
@@ -120,7 +120,7 @@ export const TodoProvider = ({ children }) => {
     }
   };
 
-  // 5. DELETE (Remove Single Task)
+  // delete (Remove Single Task)
   const deleteTask = async (id) => {
     if(!token) { 
       console.warn("Who are ya!!!!(No Auth key)");
@@ -141,7 +141,7 @@ export const TodoProvider = ({ children }) => {
     }
   };
 
-  // 6. MASS CLEAR OUT
+  //  MASS CLEAR OUT
  const massDelete = async (type) => {
   if (!token) {
     console.warn('Who are ya!!!! (No Auth key)');

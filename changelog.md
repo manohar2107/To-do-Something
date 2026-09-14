@@ -4,8 +4,30 @@
 
 All notable changes to the **To-Do Something** project will be documented in this file.
 
+## [v0.5.0] - 2026-09-14
+
+### Added
+- **Password Visibility Toggle**: Integrated embedded show/hide toggles with custom SVG icons into password and confirm-password fields for inline credential verification.
+- **Client-Side Auth Validation**: Implemented pre-flight checks enforcing minimum username length (3 chars), password length (7 chars), and registration password confirmation before dispatching network requests.
+- **Vibrant Glassmorphism Auth UI**: Rebuilt authentication screen with layered glassmorphism cards, ambient background glowing orbs, animated tab transitions, and animated error banners.
+- **Descriptive Auth Error Messaging**: Enhanced backend `/register` and `/login` routes to return explicit error messages for duplicate users, validation constraints, and incorrect credentials.
+- **Theme Persistence**: Added multi-theme support (`default`, `dark`, `indigo`) persisted to the MongoDB user document and updated via `PATCH /api/auth/theme`.
+- **Navigation Bar**: Introduced `Navbar` component displaying live user state, instant theme switching, and account logout.
+- **Split-Screen Dashboard Layout**: Implemented a responsive two-column grid separating task creation from the active task view.
+- **In-Place Task Editing**: Moved task editing state directly into `ListItem`, replacing the edited item inline rather than rendering an external edit box[cite: 2].
+- **Responsive Mobile Overrides**: Added media queries for screen widths below `900px` and `600px`, preventing mobile auto-zoom on inputs and adapting navigation controls for small viewports.
+
+### Changed
+- Refactored `AuthContext` to use relative `/api/auth` endpoints with Vercel rewrites and Vite dev proxying, eliminating hardcoded `localhost` references.
+- Upgraded task input and edit controls to auto-scaling textareas with centered action buttons[cite: 1].
+- Restructured global CSS variables across all themes for high-contrast typography on surface and background layers[cite: 1].
+
+### Fixed
+- Resolved Cloud Run container startup crashes by adding `jsonwebtoken` and `bcryptjs` directly into `server/package.json`.
+- Configured production `JWT_SECRET` and `MONGO_URI` environment variables in Google Cloud Run.
+
 ---
-## [v1.0.0] - 2026-09-11
+## [v0.4.0] - 2026-09-11
 
 ### Added
 - **JWT Authentication Pipeline**: Created `/api/auth/register`, `/api/auth/login`, and `/api/auth/me` routes with token generation and session hydration.

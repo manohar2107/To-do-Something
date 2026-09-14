@@ -8,13 +8,13 @@ export default function ToDoList() {
 
   return (
     <article>
-      <h2>ToDo List</h2>
+      <h2 className="list-header" style={{ textAlign: 'center' }} >Your Tasks</h2>
 
       {/* Filter Buttons */}
-      <div className="filter-container">
-        <button className={selectedTasks === "All" ? "active" : ""} onClick={() => setSelectedTasks("All")}>All</button>
-        <button className={selectedTasks === "Done" ? "active" : ""} onClick={() => setSelectedTasks("Done")}>Done</button>
-        <button className={selectedTasks === "ToDo" ? "active" : ""} onClick={() => setSelectedTasks("ToDo")}>ToDo</button>
+      <div className="filter-btn-group">
+        <button className={selectedTasks === "All" ? "active filter-btn" : "filter-btn"} onClick={() => setSelectedTasks("All")}>All</button>
+        <button className={selectedTasks === "Done" ? "active filter-btn" : "filter-btn"} onClick={() => setSelectedTasks("Done")}>Done</button>
+        <button className={selectedTasks === "ToDo" ? "active filter-btn" : "filter-btn"} onClick={() => setSelectedTasks("ToDo")}>ToDo</button>
       </div>
 
       <ul className="todo-list-wrapper">
@@ -22,7 +22,7 @@ export default function ToDoList() {
       </ul>
 
       {/* Mass Delete Buttons */}
-      <div className="delete-container">
+      <div className="delete-btn-group">
         <button className="danger-btn" onClick={() => massDelete("All")}>Delete All Tasks</button>
         <button className="danger-btn" onClick={() => massDelete("Done")}>Delete Done Tasks</button>
       </div>
