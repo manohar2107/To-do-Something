@@ -101,7 +101,7 @@ export const AuthForm = () => {
         <div className="auth-brand">
           <div className="brand-badge">✓</div>
           <h2>Tomdo Jist</h2>
-          <p className="auth-subtitle">Who are you, traitor?</p>
+          <p className="auth-subtitle">{isRegister ?  'Who are you, traitor?' : 'Howdy! friend'}</p>
         </div>
 
         {/* Tab Controls */}
