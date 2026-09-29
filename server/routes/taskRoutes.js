@@ -1,148 +1,123 @@
 import express from 'express';
-import { Task } from '../models/Task.js'; // Adjust if your model uses a default export
+import mongoose from 'mongoose';
 import { authenticateToken } from '../middleware/auth.js';
+import * as TaskModule from '../models/Task.js';
+import { authorizeDoc } from '../middleware/authorizeDoc.js';
+import { Document } from '../models/Document.js';
+
+// Resolves Task regardless of whether it's named (export const Task) or default (export default Task)
+const Task = TaskModule.Task || TaskModule.default;
 
 const router = express.Router();
 
-// Enforce authentication across all task routes
-router.use(authenticateToken);
-
-// 1. Root task routes: GET all tasks, POST a new task
-router
-  .route('/')
-  .get(async (req, res) => {
-    try {
-      const tasks = await Task.find({ owner: req.user._id }).sort({ createdAt: -1 });
-      res.json(tasks);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to fetch tasks: ' + err.message });
-    }
-  })
-  .post(async (req, res) => {
-    try {
-      const { task } = req.body;
-
-      if (!task || !task.trim()) {
-        return res.status(400).json({ error: 'Task content cannot be empty' });
-      }
-
-      const newTask = await Task.create({
-        task: task.trim(),
-        owner: req.user._id,
-        done: false,
-      });
-
-      res.status(201).json(newTask);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to create task: ' + err.message });
-    }
-  });
-
-// 2. Mass operations (CRITICAL: Declared BEFORE /:id to prevent routing collision)
-router
-  .route('/mass-delete')
-  .post( async (req, res) => {
+// GET /api/tasks/doc/:docId
+router.get('/doc/:docId', authenticateToken,authorizeDoc('viewer'), async (req, res) => {
   try {
-    const { type } = req.body;
-    // Normalize casing ("Done" -> "done", "All" -> "all")
-    const mode = type ? type.toLowerCase() : '';
+    const { docId } = req.params;
 
-    let query = { owner: req.user._id };
-
-    if (mode === 'done') {
-      query.done = true;
-    } else if (mode === 'all') {
-      // Intentionally leave query as { owner: req.user._id }
-    } else {
-      return res.status(400).json({ error: 'Invalid delete type provided.' });
+    if (!mongoose.Types.ObjectId.isValid(docId)) {
+      return res.status(400).json({ error: `Invalid document ID: ${docId}` });
     }
 
-    const result = await Task.deleteMany(query);
+    if (!Task || typeof Task.find !== 'function') {
+      throw new Error("Task model is not properly imported or initialized.");
+    }
 
-    res.json({
-      message: 'Tasks cleared successfully',
-      deletedCount: result.deletedCount,
-      mode,
-    });
+    const tasks = await Task.find({ documentId: docId }).sort({ createdAt: -1 });
+    return res.status(200).json(tasks);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to mass delete: ' + err.message });
+    // 🚨 Log directly to your Node terminal
+    console.error('--- [TASK GET ROUTE ERROR] ---');
+    console.error(err);
+    console.error('------------------------------');
+
+    return res.status(500).json({ 
+      error: 'Failed to fetch tasks for this document',
+      details: err.message 
+    });
   }
-})
-  .delete(async (req, res) => {
-    // Fallback support if frontend dispatches standard DELETE
-    try {
-      const { type } = req.query;
-      let query = { owner: req.user._id };
+});
 
-      if (type === 'done') {
-        query = {
-          owner: req.user._id,
-          $or: [{ done: true }, { completed: true }],
-        };
-      }
+// POST /api/tasks/doc/:docId
+router.post('/doc/:docId', authenticateToken,authorizeDoc('editor'), async (req, res) => {
+  try {
+    const { docId } = req.params;
+    const { task } = req.body;
 
-      const result = await Task.deleteMany(query);
-      res.json({
-        message: 'Tasks cleared successfully',
-        deletedCount: result.deletedCount,
-      });
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to mass delete: ' + err.message });
+    if (!task || !task.trim()) {
+      return res.status(400).json({ error: 'Task text is required' });
     }
-  });
 
-// 3. Individual task operations by ID
-router
-  .route('/:id')
-  .patch(async (req, res) => {
-    try {
-      const task = await Task.findOneAndUpdate(
-        { _id: req.params.id, owner: req.user._id },
-        req.body,
-        { new: true, runValidators: true }
-      );
-
-      if (!task) {
-        return res.status(404).json({ error: 'Task not found or unauthorized' });
-      }
-
-      res.json(task);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to update task: ' + err.message });
+    if (!mongoose.Types.ObjectId.isValid(docId)) {
+      return res.status(400).json({ error: `Invalid document ID: ${docId}` });
     }
-  })
-  .put(async (req, res) => {
-    try {
-      const task = await Task.findOneAndUpdate(
-        { _id: req.params.id, owner: req.user._id },
-        req.body,
-        { new: true, runValidators: true }
-      );
 
-      if (!task) {
-        return res.status(404).json({ error: 'Task not found or unauthorized' });
-      }
+    const newTask = await Task.create({
+      documentId: docId,
+      task: task.trim(),
+      createdBy: req.user._id,
+      done: false,
+    });
 
-      res.json(task);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to update task: ' + err.message });
+    return res.status(201).json(newTask);
+  } catch (err) {
+    console.error('[TASK CREATE ROUTE ERROR]:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/tasks/:id
+router.patch('/:id', authenticateToken, async (req, res) => {
+  try {
+    const updated = await Task.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'Task not found' });
+    return res.json(updated);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/tasks/:id
+router.delete('/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid task ID format' });
     }
-  })
-  .delete(async (req, res) => {
-    try {
-      const task = await Task.findOneAndDelete({
-        _id: req.params.id,
-        owner: req.user._id,
-      });
 
-      if (!task) {
-        return res.status(404).json({ error: 'Task not found or unauthorized' });
-      }
-
-      res.json({ message: 'Task deleted successfully', id: req.params.id });
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to delete task: ' + err.message });
+    const task = await Task.findById(id);
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
     }
-  });
+
+    // Lookup the parent document
+    const doc = await Document.findById(task.documentId);
+    if (!doc) {
+      return res.status(404).json({ error: 'Parent workspace not found' });
+    }
+
+    const userId = req.user._id.toString();
+    const isOwner = doc.owner.toString() === userId;
+    const collaborator = doc.collaborators?.find(
+      (c) => (c.user?._id || c.user)?.toString() === userId
+    );
+    const isEditor = collaborator && collaborator.role === 'editor';
+
+    // BLOCK VIEWERS
+    if (!isOwner && !isEditor) {
+      return res.status(403).json({ error: 'Viewers cannot delete tasks from this workspace.' });
+    }
+
+    await Task.findByIdAndDelete(id);
+    return res.status(200).json({ message: 'Task deleted successfully', id });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
 
 export default router;

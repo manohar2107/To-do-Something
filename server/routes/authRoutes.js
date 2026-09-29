@@ -1,13 +1,16 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { User } from '../models/User.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-const genarateToken = (id) =>{
-    return jwt.sign({id},process.env.JWT_SECRET,{expiresIn:'7d'});
-}
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d', // 30 days
+  });
+};
 
 router.post('/register', async (req, res) => {
     try{
@@ -57,19 +60,26 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ error: "PetName not found" });
         }
 
-        if(user && (await user.comparePassword(password))){
-            return res.status(200).json({
-                _id:user._id,
-                username:user.username,
-                theme:user.theme || 'default',
-                token:genarateToken(user._id)
-            });
-        }else{
-            return res.status(400).json({ error: "Invalid ciggrete key" });
-        }
+        if (user && (await user.comparePassword(password))) {
+      const token = generateToken(user._id);
+
+      return res.status(200).json({
+        token,
+        user: {
+          id: user._id,
+          username: user.username,
+          theme: user.theme || 'default',
+        },
+        // Flat fallbacks in case legacy components look for top-level keys
+        _id: user._id,
+        username: user.username,
+        theme: user.theme || 'default',
+      });
+    }
+    return res.status(400).json({error:'Invalid PetName or PussWord!!!'});
     }catch(err){
         console.error("Not Able to Login the party :(", err);
-        return res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: err.message || 'Server error during login.' });
     }
 });
 

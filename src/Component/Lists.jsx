@@ -1,29 +1,25 @@
-import React, { useState,useContext } from 'react';
-import {TodoContext} from "../context/TodoContext";
+// src/Component/Lists.jsx
+import React, { useState, useContext } from 'react';
+import { TodoContext } from '../context/TodoContext';
+import { useDocument } from '../context/DocumentContext'; // 👈 Import Document Context
 import '../App.css';
 
-function ListItem({ list, onToggle, onSaveEdit, onDelete }) {
-  const taskId=list.id || list._id; // Fallback for mongoDB's _id if id is not present
+function ListItem({ list, onToggle, onSaveEdit, onDelete, canEdit }) {
+  const taskId = list.id || list._id;
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(list.task);
 
   const handleSave = () => {
-    if(!editedText.trim()){
-      alert("Task cannot be empty. Please enter a valid task.");
-      return;
-    }
+    if (!editedText.trim()) return;
     onSaveEdit(taskId, editedText.trim());
     setIsEditing(false);
   };
 
-  const handleCancel = () => {
-    setEditedText(list.task);
-    setIsEditing(false);
-  }
-
-  const editInput= ()=>{
-    return (
-      <div className="edit-box-container">
+  return (
+    <li style={{ marginBottom: "10px", listStyle: "none" }} className="todo-card">
+      <div className="todo-card-body">
+        {isEditing && canEdit ? (
+          <div className="edit-box-container">
             <textarea
               className="task-edit-textarea"
               value={editedText}
@@ -33,52 +29,58 @@ function ListItem({ list, onToggle, onSaveEdit, onDelete }) {
             />
             <div className="edit-actions">
               <button className="save-btn" onClick={handleSave}>Save</button>
-              <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
+              <button className="cancel-btn" onClick={() => setIsEditing(false)}>Cancel</button>
             </div>
           </div>
-    );
-  }
-
-  const normalView=()=>{
-    return (
-      <>
-            <span 
-              style={{ textDecoration: list.done ? "line-through" : "none" }} 
+        ) : (
+          <>
+            <span
+              style={{ textDecoration: list.done ? "line-through" : "none" }}
               className="task-text"
             >
               {list.task}
             </span>
+
             <div className="actions">
-              <input 
-                type="checkbox" 
-                checked={list.done} 
-                onChange={() => onToggle(taskId, list.done)} 
+              {/* Checkbox: disabled if viewer */}
+              <input
+                type="checkbox"
+                checked={list.done}
+                disabled={!canEdit}
+                onChange={() => canEdit && onToggle(taskId, list.done)}
+                style={{ cursor: canEdit ? 'pointer' : 'not-allowed' }}
               />
-              <button onClick={() => setIsEditing(true)} className="edit-btn">✏️</button>
-              <button onClick={() => taskId && onDelete(taskId)} className="delete-btn">🗑️</button>
+
+              {/* Action buttons: Only visible if Editor or Owner */}
+              {canEdit && (
+                <>
+                  <button onClick={() => setIsEditing(true)} className="edit-btn" title="Edit">
+                    ✏️
+                  </button>
+                  <button onClick={() => onDelete(taskId)} className="delete-btn" title="Delete">
+                    🗑️
+                  </button>
+                </>
+              )}
             </div>
           </>
-    );
-  }
-
-  return (
-    <li style={{ marginBottom: "10px", listStyle: "none" }} className="todo-card">
-      <div className="todo-card-body">
-        {isEditing ? editInput() : normalView()}
+        )}
       </div>
     </li>
   );
 }
 
-export default function List({selectedTasks }) {
-  const {tasks, toggleTask, editTaskText, deleteTask} = useContext(TodoContext);
+export default function List({ selectedTasks, canEdit:propEdit}) {
+  const { tasks, toggleTask, editTaskText, deleteTask } = useContext(TodoContext);
+  const docCtx = useDocument(); // 👈 Access role state
 
-  // Filter tasks inline using cleaner logic
+  const canEdit=propEdit!==undefined?propEdit:docCtx?.canEdit;
+
   const safeTasks = Array.isArray(tasks) ? tasks : [];
-  const filteredTasks = safeTasks.filter(t => {
+  const filteredTasks = safeTasks.filter((t) => {
     if (selectedTasks === "Done") return t.done;
     if (selectedTasks === "ToDo") return !t.done;
-    return true; // "All"
+    return true;
   });
 
   if (filteredTasks.length === 0) {
@@ -87,15 +89,18 @@ export default function List({selectedTasks }) {
 
   return (
     <>
-      {filteredTasks.map(list => (
-        <ListItem 
-          key={list.id || list._id} 
-          list={list} 
+    <ul style={{ padding: 0, margin: 0 }}>
+      {filteredTasks.map((list) => (
+        <ListItem
+          key={list.id || list._id}
+          list={list}
+          canEdit={canEdit}
           onToggle={toggleTask}
-          onSaveEdit={editTaskText} 
-          onDelete={deleteTask} 
+          onSaveEdit={editTaskText}
+          onDelete={deleteTask}
         />
       ))}
+    </ul>
     </>
   );
 }

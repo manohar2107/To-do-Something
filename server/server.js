@@ -6,6 +6,7 @@ import { Task } from './models/Task.js';
 import dns from 'node:dns';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import documentRoutes from './routes/documentRoutes.js';
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/documents', documentRoutes);
 app.use('/api/tasks', taskRoutes);
 const PORT = process.env.PORT || 8080;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/todo_database';

@@ -4,6 +4,27 @@
 
 All notable changes to the **To-Do Something** project will be documented in this file.
 
+## [v1.0.0] - 2026-09-29
+
+### Added
+- **Multi-Workspace Isolation**: Workspaces (`Document`) and their tasks are fully partitioned per workspace ID.
+- **Dedicated View Routing**: Separated the Workspace Grid overview from the active Document task view, with a back navigation button.
+- **Multi-User Collaboration**:
+  - Collaborator sharing modal with username resolution.
+  - Role-Based Access Control (RBAC) with `Owner`, `Editor`, and `Viewer` designations.
+  - Real-time collaborator role toggling (`editor` ↔ `viewer`) and collaborator removal.
+- **Live Task Navigation Filters**: Task view tab switches for `All`, `To-Do` (active), and `Done` (completed) tasks with dynamic count badges.
+
+### Changed
+- **Read-Only Enforcement**: Restricted Viewer accounts from creating, modifying, checking, or deleting tasks both on the client UI and via backend route guards.
+- **Enhanced Task Persistence**: Refactored `taskRoutes` and `TodoContext` to use strict template literal URI interpolation with Mongoose ID format validation.
+
+### Fixed
+- Fixed unhandled `403 Forbidden` errors during document creation by decoupling document authorization middleware from new creation routes.
+- Resolved `500 Internal Server Error` in task operations caused by missing model imports and unhandled `Document` reference lookups in task routes.
+- Eliminated cross-workspace task state bleeding by enforcing immediate state reset on workspace transition.
+- Fixed React runtime `ReferenceError` during inline task saves and list updates.
+
 ## [v0.5.0] - 2026-09-14
 
 ### Added

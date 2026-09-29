@@ -1,8 +1,11 @@
 import React, { useState,useContext } from 'react';
 import List from './Lists';
 import { TodoContext } from '../context/TodoContext';
+import { useDocument } from '../context/DocumentContext';
+import '../App.css';
 
 export default function ToDoList() {
+  const {canEdit}=useDocument();
   const [selectedTasks, setSelectedTasks] = useState("All");
   const {massDelete} = useContext(TodoContext);
 
@@ -18,14 +21,16 @@ export default function ToDoList() {
       </div>
 
       <ul className="todo-list-wrapper">
-        <List selectedTasks={selectedTasks}/>
+        <List selectedTasks={selectedTasks} canEdit={canEdit}/>
       </ul>
 
       {/* Mass Delete Buttons */}
-      <div className="delete-btn-group">
-        <button className="danger-btn" onClick={() => massDelete("All")}>Delete All Tasks</button>
-        <button className="danger-btn" onClick={() => massDelete("Done")}>Delete Done Tasks</button>
-      </div>
+      {/* {canEdit && (
+        <div className="bulk-actions-container">
+          <button onClick={handleDeleteAll} className="bulk-btn">Delete All Tasks</button>
+          <button onClick={handleDeleteDone} className="bulk-btn">Delete Done Tasks</button>
+        </div>
+      )} */}
     </article>
   );
 }

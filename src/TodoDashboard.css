@@ -1,0 +1,88 @@
+.workspace-container {
+  max-width: 720px; /* Optimal focal width for todo lists */
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem 1rem;
+  box-sizing: border-box;
+}
+
+.workspace-view-header h2 {
+  margin: 0 0 6px 0;
+  font-size: 1.5rem;
+  color: #f8fafc;
+}
+
+.workspace-view-subtitle {
+  margin: 0 0 1.5rem 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+/* Document Topbar */
+.active-doc-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.back-workspaces-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #38bdf8;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.back-workspaces-btn:hover {
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.doc-display-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Stacked and Centered Workspace Flow */
+.active-workspace-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers both ToDoInput and ToDoList */
+  width: 100%;
+}
+
+.workspace-input-panel {
+  width: 100%;
+  max-width: 620px;
+}
+
+.workspace-tasks-panel {
+  width: 100%;
+  max-width: 620px;
+}
+
+.workspace-tasks-panel.full-width {
+  flex: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.viewer-mode-notice {
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #7dd3fc;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}

@@ -1,22 +1,17 @@
+// server/models/Task.js
 import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema(
   {
-    owner: {
+    documentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Document',
       required: true,
+      index: true, // This correctly indexes the tasks by their parent document
     },
-    // Array of user IDs who have shared access to this task
-    sharedWith: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
     task: {
       type: String,
-      required: [true, 'Content is required'],
+      required: [true, 'Task is Preset!!!'],
       trim: true,
     },
     imageUrl: {
@@ -27,10 +22,15 @@ const taskSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   { timestamps: true }
 );
 
-taskSchema.index({ owner: 1, sharedWith: 1 });
+// Removed the invalid owner/sharedWith index
 
 export const Task = mongoose.model('Task', taskSchema);
+export default Task; // Added default export so taskRoutes.js can import it reliably

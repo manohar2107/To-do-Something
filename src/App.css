@@ -89,22 +89,16 @@
   color: var(--text-primary);
 }
 
-/* Filter buttons (All, Done, ToDo) */
-.filter-btn {
-  background: var(--input-bg);
-  color: var(--text-secondary);
-  border: 1px solid var(--card-border);
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.filter-btn:hover,
-.filter-btn.active {
-  background: var(--accent-color);
-  color: #ffffff;
-  border-color: var(--accent-color);
+/* Centering utility for button groups */
+.dashboard-right-panel .filter-btn-group,
+.dashboard-right-panel .delete-btn-group,
+.button-row-center {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin: 0 auto 1.25rem auto !important;
+  gap: 0.5rem;
 }
 
 /* Theme settlement */
@@ -182,36 +176,6 @@ body {
   transform: scale(0.98);
 }
 
-/* Centering utility for button groups */
-.dashboard-right-panel .filter-btn-group,
-.dashboard-right-panel .delete-btn-group,
-.button-row-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin: 14px 0;
-  flex-wrap: wrap;
-}
-
-/* Filter buttons (All, Done, ToDo) */
-.filter-btn {
-  background: var(--input-bg);
-  color: var(--text-secondary);
-  border: 1px solid var(--card-border);
-  padding: 0.45rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.filter-btn:hover,
-.filter-btn.active {
-  background: var(--accent-color);
-  color: #ffffff;
-  border-color: var(--accent-color);
-}
 
 /* Bulk Delete Buttons (Delete All Tasks, Delete Done Tasks) */
 .danger-btn,
@@ -430,19 +394,6 @@ body {
     padding: 0.75rem 1rem;
   }
 
-  /* Wrap action buttons so text doesn't overflow */
-  .dashboard-right-panel .filter-btn-group,
-  .dashboard-right-panel .delete-btn-group,
-  .button-row-center {
-    gap: 6px;
-  }
-
-  .filter-btn {
-    flex: 1; /* Distribute All / Done / ToDo evenly across screen */
-    text-align: center;
-    padding: 0.45rem 0.5rem;
-    font-size: 0.85rem;
-  }
 
   .danger-btn,
   .delete-all-btn,
@@ -478,4 +429,182 @@ body {
     padding: 6px 9px;
     font-size: 0.95rem;
   }
+}
+
+/* ============================================================
+   Document Page Card Grid (4x / 6x Format)
+   ============================================================ */
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1.25rem 1rem;
+  width: 100%;
+  padding: 0.75rem 0;
+  box-sizing: border-box;
+}
+
+/* Force 4-column layout on standard desktop */
+@media (min-width: 900px) {
+  .doc-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Expand to 6-column layout on wider screens / expanded view */
+@media (min-width: 1350px) {
+  .doc-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* Individual Document Card Wrapper */
+.doc-card-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  background: transparent;
+  outline: none;
+  transition: transform 0.18s ease;
+}
+
+.doc-card-page:hover {
+  transform: translateY(-4px);
+}
+
+/* Miniature Document Page Sheet */
+.doc-sheet {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.35; /* Classic paper aspect ratio */
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 16px 12px 10px 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.doc-card-page:hover .doc-sheet {
+  border-color: var(--accent-color);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+
+/* Active Highlight */
+.doc-card-page.active .doc-sheet {
+  border: 2px solid var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2), 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Folded Dog-Ear Paper Corner (Top Right) */
+.doc-corner-fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 16px 16px 0;
+  border-color: transparent var(--surface-color) transparent transparent;
+  filter: drop-shadow(-1px 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+/* Simulated Document Content Lines */
+.doc-sheet-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.skeleton-line {
+  display: block;
+  height: 4px;
+  background: var(--card-border);
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.skeleton-line.title-line {
+  height: 6px;
+  width: 70%;
+  background: var(--accent-color);
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+.skeleton-line.short-line {
+  width: 45%;
+}
+
+/* Shared Collab Badge */
+.doc-shared-badge {
+  align-self: flex-end;
+  background: var(--badge-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+
+/* Document Title Below Sheet */
+.doc-card-info {
+  width: 100%;
+  text-align: center;
+}
+
+.doc-card-title {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 4px;
+}
+
+.doc-card-page.active .doc-card-title {
+  color: var(--accent-color);
+}
+
+
+/* Center task filter buttons */
+.filter-btn-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.filter-btn {
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--card-border);
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.filter-btn:hover {
+  border-color: var(--accent-color);
+  color: #ffffff;
+}
+
+.filter-btn.active {
+  background: var(--accent-color);
+  color: #ffffff;
+  border-color: var(--accent-color);
+  font-weight: 600;
 }
