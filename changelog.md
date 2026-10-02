@@ -4,6 +4,23 @@
 
 All notable changes to the **To-Do Something** project will be documented in this file.
 
+## [1.0.1] - 2026-10-03
+
+### Added
+- **Dynamic Filter Count Badges**: Live numerical count tags added to the `All`, `Done`, and `To-Do` filter buttons reflecting current workspace task counts[cite: 13, 14, 15].
+- **Batch Task Purging**: Integrated mass delete actions allowing editors and owners to clear all tasks or completed tasks in one request.
+- **Styled Confirmation Modals**: Visual styling and action states for mass deletion operations[cite: 16].
+
+### Changed
+- **Click-to-Edit Workspace Title**: Replaced the pencil icon trigger with an inline, click-to-edit workspace title with dedicated dark theme input styling[cite: 10, 11, 13].
+- **Layout & Symmetry Refinements**: Symmetrically centered `ToDoInput`, filter controls, and task lists within a responsive single-column layout[cite: 10, 11].
+- **Direct Username Workspace Sharing**: Streamlined collaborator invitations in `ShareModal` back to direct username entry without extra directory queries.
+
+### Fixed
+- **Mass Delete Route Parameter Handling**: Resolved a 400 Bad Request error by standardizing case-sensitive action types (`all` and `done`) between client and server.
+- **Workspace-Scoped Bulk Deletions**: Scoped bulk deletions using `/api/tasks/doc/:docId/mass-delete` to eliminate unhandled reference errors and prevent orphaned task mutations.
+- **Action Control Styles**: Styled mass deletion action buttons to replace default browser buttons with responsive dark theme components[cite: 16].
+
 ## [v1.0.0] - 2026-09-29
 
 ### Added

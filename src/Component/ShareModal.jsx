@@ -1,72 +1,37 @@
-// src/components/ShareModal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDocument } from '../context/DocumentContext';
-import { useAuth } from '../context/AuthContext';
 import './ShareModal.css';
 
 export const ShareModal = ({ isOpen, onClose }) => {
-  const { activeDoc, shareDocument, updateCollaboratorRole, removeCollaborator, isOwner } = useDocument();
-  const { token } = useAuth();
+  const {
+    activeDoc,
+    shareDocument,
+    updateCollaboratorRole,
+    removeCollaborator,
+    isOwner,
+  } = useDocument();
 
-  const [availableUsers, setAvailableUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState('');
+  const [username, setUsername] = useState('');
   const [role, setRole] = useState('editor');
   const [statusMessage, setStatusMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [fetchingUsers, setFetchingUsers] = useState(false);
-
-  // Fetch registered users when modal opens
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const fetchUsers = async () => {
-      setFetchingUsers(true);
-      setError(null);
-      try {
-        const res = await fetch('/api/users', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
-        if (res.ok) {
-          setAvailableUsers(data);
-        } else {
-          setError(data.error || 'Failed to load user directory');
-        }
-      } catch (err) {
-        setError('Network error loading users');
-      } finally {
-        setFetchingUsers(false);
-      }
-    };
-
-    fetchUsers();
-  }, [isOpen, token]);
 
   if (!isOpen || !activeDoc) return null;
 
-  // Filter out users who are already collaborators or owner
-  const existingCollabIds = new Set(
-    (activeDoc.collaborators || []).map((c) => (c.user?._id || c.user)?.toString())
-  );
-  const eligibleUsers = availableUsers.filter((u) => !existingCollabIds.has(u._id.toString()));
-
   const handleShare = async (e) => {
     e.preventDefault();
-    if (!selectedUser) return;
+    const targetUsername = username.trim();
+    if (!targetUsername) return;
 
     setError(null);
     setStatusMessage(null);
     setLoading(true);
 
     try {
-      // Find the chosen user object to send username
-      const chosen = availableUsers.find((u) => u._id === selectedUser);
-      await shareDocument(activeDoc._id, chosen.username, role);
-      setStatusMessage(`Added ${chosen.username} as ${role}!`);
-      setSelectedUser('');
+      await shareDocument(activeDoc._id, targetUsername, role);
+      setStatusMessage(`Added "${targetUsername}" as ${role}!`);
+      setUsername('');
     } catch (err) {
       setError(err.message || 'Failed to add collaborator');
     } finally {
@@ -77,50 +42,38 @@ export const ShareModal = ({ isOpen, onClose }) => {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
+        {/* Modal Header */}
         <div className="modal-header">
           <div className="modal-title-group">
             <h3>Share "{activeDoc.title}"</h3>
-            <p className="modal-subtitle">Add users to collaborate on this workspace</p>
+            <p className="modal-subtitle">Invite collaborators by entering their username</p>
           </div>
           <button type="button" className="modal-x-btn" onClick={onClose} aria-label="Close">
             ✕
           </button>
         </div>
 
-        {/* Alerts */}
+        {/* Feedback Banners */}
         {error && <div className="modal-banner error-banner">{error}</div>}
         {statusMessage && <div className="modal-banner success-banner">{statusMessage}</div>}
 
-        {/* User Selection Dropdown (Only for Workspace Owner) */}
+        {/* Username Text Input (Owner Only) */}
         {isOwner && (
           <form onSubmit={handleShare} className="share-input-row">
-            <select
-              value={selectedUser}
-              onChange={(e) => setSelectedUser(e.target.value)}
-              className="share-select-user"
+            <input
+              type="text"
+              placeholder="Enter username..."
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="share-input-username"
               required
-              disabled={fetchingUsers || eligibleUsers.length === 0}
-            >
-              <option value="">
-                {fetchingUsers
-                  ? 'Loading users...'
-                  : eligibleUsers.length === 0
-                  ? 'No more users to add'
-                  : 'Select a user to invite...'}
-              </option>
-              {eligibleUsers.map((u) => (
-                <option key={u._id} value={u._id}>
-                  {u.username}
-                </option>
-              ))}
-            </select>
+              autoFocus
+            />
 
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
               className="share-select-role"
-              disabled={!selectedUser}
             >
               <option value="editor">Editor</option>
               <option value="viewer">Viewer</option>
@@ -129,7 +82,7 @@ export const ShareModal = ({ isOpen, onClose }) => {
             <button
               type="submit"
               className="share-submit-btn"
-              disabled={loading || !selectedUser}
+              disabled={loading || !username.trim()}
             >
               {loading ? 'Adding...' : 'Invite'}
             </button>

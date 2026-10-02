@@ -96,39 +96,6 @@
   color: #4ade80;
 }
 
-/* Input Row */
-.share-input-row {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-}
-
-.share-input-row input {
-  flex: 1;
-  background: #1b1f30;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: #f8fafc;
-  font-size: 0.88rem;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-
-.share-input-row input:focus {
-  border-color: #38bdf8;
-}
-
-.share-input-row select {
-  background: #1b1f30;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  color: #f8fafc;
-  padding: 8px 10px;
-  font-size: 0.85rem;
-  outline: none;
-  cursor: pointer;
-}
 
 .share-submit-btn {
   background: #38bdf8;
@@ -359,4 +326,57 @@
   font-size: 0.85rem;
   outline: none;
   cursor: pointer;
+}
+
+.share-input-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.share-input-username {
+  flex: 1.6;
+  background: #1b1f30;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #f8fafc;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.share-input-username:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
+}
+
+.share-select-role {
+  flex: 0.8;
+  background: #1b1f30;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #f8fafc;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.share-submit-btn {
+  background: #38bdf8;
+  color: #0b1120;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.share-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
