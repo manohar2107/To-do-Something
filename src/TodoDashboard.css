@@ -43,40 +43,6 @@
   background: rgba(56, 189, 248, 0.15);
 }
 
-.doc-display-title {
-  margin: 0;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #f8fafc;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Stacked and Centered Workspace Flow */
-.active-workspace-layout {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Centers both ToDoInput and ToDoList */
-  width: 100%;
-}
-
-.workspace-input-panel {
-  width: 100%;
-  max-width: 620px;
-}
-
-.workspace-tasks-panel {
-  width: 100%;
-  max-width: 620px;
-}
-
-.workspace-tasks-panel.full-width {
-  flex: 1;
-  max-width: 700px;
-  margin: 0 auto;
-}
-
 .viewer-mode-notice {
   background: rgba(56, 189, 248, 0.08);
   border: 1px solid rgba(56, 189, 248, 0.25);
@@ -85,4 +51,137 @@
   border-radius: 8px;
   font-size: 0.85rem;
   margin-bottom: 1.5rem;
+}
+/* --- TodoDashboard.css --- */
+
+.workspace-main-container {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem 1rem;
+  box-sizing: border-box;
+}
+
+/* Header Topbar */
+.active-doc-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+/* Click-to-Edit Title & Input */
+.doc-title-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+}
+
+.workspace-title-text {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.workspace-title-text.clickable {
+  cursor: pointer;
+}
+
+.workspace-title-text.clickable:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Styled inline input replacing the plain white box */
+.workspace-title-input {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid var(--accent-color, #a855f7);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  text-align: center;
+  outline: none;
+  width: 80%;
+  max-width: 320px;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+}
+
+/* Topbar Actions */
+.doc-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.action-btn-share {
+  background: #ffffff;
+  color: #1e1b4b;
+  border: none;
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.action-btn-share:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.action-btn-delete {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+}
+
+.action-btn-delete:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+/* Stack and Uniform Card Widths */
+.workspace-content-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.workspace-card-centered {
+  width: 100%;
+}
+
+/* Responsive adjustment for narrow screens */
+@media (max-width: 540px) {
+  .active-doc-topbar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .doc-title-wrapper {
+    order: -1;
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
 }

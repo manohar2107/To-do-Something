@@ -576,35 +576,119 @@ body {
 }
 
 
-/* Center task filter buttons */
+/* --- Append to src/App.css --- */
+
+/* Filter Button Group & Badges */
 .filter-btn-group {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
   width: 100%;
 }
 
 .filter-btn {
-  background: var(--input-bg);
-  color: var(--text-secondary);
-  border: 1px solid var(--card-border);
-  padding: 0.35rem 0.85rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background: var(--input-bg, rgba(255, 255, 255, 0.05));
+  color: var(--text-secondary, #94a3b8);
+  border: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
+  padding: 0.4rem 0.9rem;
+  border-radius: 9999px;
   font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
 }
 
 .filter-btn:hover {
-  border-color: var(--accent-color);
+  border-color: var(--accent-color, #a855f7);
   color: #ffffff;
 }
 
 .filter-btn.active {
-  background: var(--accent-color);
+  background: var(--accent-color, #a855f7);
   color: #ffffff;
-  border-color: var(--accent-color);
+  border-color: var(--accent-color, #a855f7);
   font-weight: 600;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent-color, #a855f7) 35%, transparent);
+}
+
+.filter-count-badge {
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  font-size: 0.72rem;
+  padding: 1px 7px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.filter-btn.active .filter-count-badge {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.section-title {
+  text-align: center;
+  color: #f8fafc;
+  font-size: 1.3rem;
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+}
+/* Container to center and space the bulk actions */
+.bulk-actions-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  width: 100%;
+}
+
+/* Base style for bulk action buttons */
+.bulk-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  outline: none;
+}
+
+/* Subtle neutral hover */
+.bulk-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Dedicated danger hover for "Delete All" */
+.bulk-btn.delete-all-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+}
+
+/* Dedicated warning/muted hover for "Delete Done" */
+.bulk-btn.delete-done-btn:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fcd34d;
+}
+
+/* Active click state */
+.bulk-btn:active {
+  transform: translateY(0);
 }

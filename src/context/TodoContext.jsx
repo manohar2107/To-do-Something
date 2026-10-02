@@ -10,7 +10,7 @@ export const TodoProvider = ({ children }) => {
   const {activeDoc}=useDocument();
   const [loading,setLoading]=useState(false);
   const {token} = useAuth(); // Get the auth token from context
-
+  
   // Fetch (Initial Load)
   useEffect(() => {
     if (!token || !activeDoc?._id) {
@@ -136,8 +136,16 @@ export const TodoProvider = ({ children }) => {
     return;
   }
 
+  const docId = activeDoc?._id;
+  if (!docId) {
+    console.warn('No active workspace selected');
+    return;
+  }
+
+  const mode = type.toLowerCase();
+
   try {
-    const response = await fetch('/api/tasks/mass-delete', {
+    const response = await fetch(`/api/tasks/doc/${docId}/mass-delete`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -174,7 +182,7 @@ export const TodoProvider = ({ children }) => {
       toggleTask, 
       editTaskText, 
       deleteTask, 
-      massDelete 
+      massDelete
     }}>
       {children}
     </TodoContext.Provider>

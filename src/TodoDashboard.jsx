@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// src/TodoDashboard.jsx
+import React, { useState, useEffect } from 'react';
 import { useDocument } from './context/DocumentContext';
 import { DocumentGrid } from './Component/DocumentGrid';
 import { ShareModal } from './Component/ShareModal';
@@ -7,27 +8,50 @@ import ToDoList from './Component/ToDoList';
 import './TodoDashboard.css';
 
 export const TodoDashboard = () => {
-  const { activeDoc, setActiveDoc, updateDocumentTitle, deleteDocument, isOwner, canEdit } = useDocument();
+  const {
+    activeDoc,
+    setActiveDoc,
+    updateDocumentTitle,
+    deleteDocument,
+    isOwner,
+    canEdit,
+  } = useDocument();
+
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [docTitle, setDocTitle] = useState('');
 
-  const handleTitleBlur = () => {
+  useEffect(() => {
+    if (activeDoc) {
+      setDocTitle(activeDoc.title || '');
+    }
+  }, [activeDoc]);
+
+  const handleTitleSubmit = () => {
     setIsEditingTitle(false);
-    if (docTitle.trim() && docTitle !== activeDoc?.title) {
-      updateDocumentTitle(activeDoc._id, docTitle.trim());
+    const trimmed = docTitle.trim();
+    if (trimmed && trimmed !== activeDoc?.title) {
+      updateDocumentTitle(activeDoc._id, trimmed);
+    } else {
+      setDocTitle(activeDoc?.title || '');
     }
   };
 
-  // -------------------------------------------------------------
-  // VIEW 1: No workspace active -> Render ONLY the Workspaces Grid
-  // -------------------------------------------------------------
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleTitleSubmit();
+    if (e.key === 'Escape') {
+      setDocTitle(activeDoc?.title || '');
+      setIsEditingTitle(false);
+    }
+  };
+
+  // View 1: Document Grid Overview
   if (!activeDoc) {
     return (
-      <div className="workspace-container">
+      <div className="workspace-main-container">
         <header className="workspace-view-header">
-          <h2>Your Workspaces</h2>
-          <p className="workspace-view-subtitle">Select an existing list or create a new workspace.</p>
+          <h2>Scheduler'</h2>
+          <p className="workspace-view-subtitle">Select an existing jist or create a new </p>
         </header>
         <section className="workspace-grid-section">
           <DocumentGrid />
@@ -36,63 +60,59 @@ export const TodoDashboard = () => {
     );
   }
 
-  // -------------------------------------------------------------
-  // VIEW 2: Active workspace selected -> Render ONLY that Document
-  // -------------------------------------------------------------
+  // View 2: Single Workspace Document View
   return (
-    <div className="workspace-container">
-      {/* Navigation & Document Action Bar */}
+    <div className="workspace-main-container">
+      {/* Top Header Bar */}
       <div className="active-doc-topbar">
         <button
           type="button"
           className="back-workspaces-btn"
           onClick={() => setActiveDoc(null)}
         >
-          ← All Workspaces
+          ← All Jists!!!
         </button>
 
-        <div className="doc-title-group">
+        {/* Clickable Workspace Title (No Pencil) */}
+        <div className="doc-title-wrapper">
           {isEditingTitle && isOwner ? (
             <input
-              className="inline-doc-title-input"
+              type="text"
+              className="workspace-title-input"
               value={docTitle}
               onChange={(e) => setDocTitle(e.target.value)}
-              onBlur={handleTitleBlur}
-              onKeyDown={(e) => e.key === 'Enter' && handleTitleBlur()}
+              onBlur={handleTitleSubmit}
+              onKeyDown={handleKeyDown}
               autoFocus
             />
           ) : (
             <h2
-              className={`doc-display-title ${isOwner ? 'editable' : ''}`}
-              onClick={() => {
-                if (isOwner) {
-                  setDocTitle(activeDoc.title);
-                  setIsEditingTitle(true);
-                }
-              }}
-              title={isOwner ? "Click to rename" : "Workspace Name"}
+              className={`workspace-title-text ${isOwner ? 'clickable' : ''}`}
+              onClick={() => isOwner && setIsEditingTitle(true)}
+              title={isOwner ? 'Click to rename workspace' : ''}
             >
-              {activeDoc.title} {isOwner && <span className="edit-pencil">✏️</span>}
+              {activeDoc.title}
             </h2>
           )}
         </div>
 
+        {/* Share & Delete Action Buttons */}
         <div className="doc-header-actions">
           {isOwner && (
             <>
               <button
                 type="button"
-                className="share-btn-pill"
+                className="action-btn-share"
                 onClick={() => setIsShareOpen(true)}
               >
-                👥 Share
+                👥
               </button>
               <button
                 type="button"
-                className="doc-delete-btn"
+                className="action-btn-delete"
                 title="Delete Workspace"
                 onClick={() => {
-                  if (window.confirm(`Delete "${activeDoc.title}" and all its tasks?`)) {
+                  if (window.confirm(`Delete workspace "${activeDoc.title}" and its tasks?`)) {
                     deleteDocument(activeDoc._id);
                     setActiveDoc(null);
                   }
@@ -105,23 +125,23 @@ export const TodoDashboard = () => {
         </div>
       </div>
 
-      {/* Read-Only Banner for Viewers */}
+      {/* Viewer Notice */}
       {!canEdit && (
         <div className="viewer-mode-notice">
-          👁️ You are viewing this workspace in Read-Only mode.
+          👁️️ You are viewing this workspace in Read-Only mode.
         </div>
       )}
 
-      {/* Active Workspace Task Panel */}
-      <div className="active-workspace-layout">
+      {/* Centered Workflow: Input and Task List */}
+      <div className="workspace-content-stack">
         {canEdit && (
-          <aside className="workspace-input-panel">
+          <div className="workspace-card-centered">
             <ToDoInput />
-          </aside>
+          </div>
         )}
-        <main className={`workspace-tasks-panel ${!canEdit ? 'full-width' : ''}`}>
+        <div className="workspace-card-centered">
           <ToDoList />
-        </main>
+        </div>
       </div>
 
       <ShareModal isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />

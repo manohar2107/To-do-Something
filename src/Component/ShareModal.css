@@ -326,3 +326,37 @@
 .remove-collab-btn:hover {
   background: rgba(239, 68, 68, 0.15);
 }
+
+.share-select-user {
+  flex: 1.6;
+  background: #1b1f30;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #f8fafc;
+  font-size: 0.88rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.share-select-user:focus {
+  border-color: #38bdf8;
+}
+
+.share-select-user:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.share-select-role {
+  flex: 0.8;
+  background: #1b1f30;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #f8fafc;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}

@@ -66,6 +66,30 @@ router.post('/doc/:docId', authenticateToken,authorizeDoc('editor'), async (req,
   }
 });
 
+router.post('/doc/:docId/mass-delete', authenticateToken, authorizeDoc('editor'), async (req, res) => {
+  try {
+    const { docId } = req.params;
+    const { type } = req.body; // 'All' or 'Done'
+
+   const normalizedType = type ? type.toLowerCase() : '';
+    if (!['all', 'done'].includes(normalizedType)) {
+      return res.status(400).json({ error: 'Invalid delete type. Must be "all" or "done".' });
+    }
+
+    const filter = { documentId: docId };
+    if (normalizedType === 'done') {
+      filter.done = true;
+    }
+    
+    const deletedTasks = await Task.deleteMany(filter);
+    return res.status(200).json({ message: `${deletedTasks.deletedCount} tasks deleted successfully`, count: deletedTasks.deletedCount });  
+
+  } catch (err) {
+    console.error('[TASK MASS DELETE ERROR]:', err);
+    return res.status(500).json({ error: 'Failed to delete tasks: ' + err.message });
+  }
+});
+
 // PATCH /api/tasks/:id
 router.patch('/:id', authenticateToken, async (req, res) => {
   try {
